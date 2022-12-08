@@ -1,14 +1,25 @@
 import Head from "next/head";
 import Image from "next/image";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/Home.module.css";
-import { useGetPokemonByNameQuery } from "./services/pokeapi";
+import {
+  useGetPokemonByNameQuery,
+  useGetPokemonListQuery,
+} from "./services/pokeapi";
 import { increment, incrementByAmount } from "./slice/counterSlice";
 
 export default function Home() {
+  const [Name, setName] = useState("raticate");
   const dispatch = useDispatch();
   let { value } = useSelector((state) => state.counter);
-  const { data, error, isLoading } = useGetPokemonByNameQuery("charizard");
+  const { data, error, isLoading } = useGetPokemonByNameQuery(Name);
+  const list = useGetPokemonListQuery();
+
+  // functions
+  const handleNameChange = (name) => {
+    setName(name);
+  };
   return (
     <div>
       <Head>
@@ -32,6 +43,14 @@ export default function Home() {
           <img src={data.sprites.front_shiny} alt={data.species.name} />
         </>
       ) : null}
+
+      <div>
+        {list?.data?.results.map((pokemon) => (
+          <div key={pokemon.name}>
+            <p onClick={() => handleNameChange(pokemon.name)}>{pokemon.name}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
